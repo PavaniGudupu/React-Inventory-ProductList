@@ -20,8 +20,8 @@ const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [lastEditId, setLastEditId] = useState(null);
 
-const [appliedFilters, setAppliedFilters] = useState({});
-const [isFilterMode, setIsFilterMode] = useState(false);     //chips
+  const [appliedFilters, setAppliedFilters] = useState({});
+  const [isFilterMode, setIsFilterMode] = useState(false); //chips
 
   const [isFilterOpen, setFilterScreen] = useState(false);
 
@@ -29,52 +29,30 @@ const [isFilterMode, setIsFilterMode] = useState(false);     //chips
   const location = useLocation();
 
   //  Fetch products
- const fetchProducts = useCallback(async () => {
-  try {
-
-    let res;
-
-    if (isFilterMode) {
-
-      // 👉 FILTER API
-      res = await fetch("http://localhost:4000/productList-Filters", {
+  const fetchProducts = useCallback(async () => {
+    try {
+      const bodyData = {
+        page: currentPage,
+        size,
+        ...(isFilterMode
+          ? { filters: appliedFilters }
+          : { filterCategory, search }),
+      };
+      const res = await fetch("http://localhost:4000/productList", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filters: appliedFilters,
-          page: currentPage,
-          size
-        }),
+        body: JSON.stringify(bodyData),
       });
-
-    } else {
-
-      // 👉 NORMAL API
-      res = await fetch("http://localhost:4000/productList", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filterCategory,
-          search,
-          page: currentPage,
-          size
-        }),
-      });
-
+      const json = await res.json();
+      const pagination = json.response;
+      setData(pagination.results);
+      setTotalPages(pagination.totalPages);
+    } catch (error) {
+      console.error("Fetch error:", error);
     }
+  }, [currentPage, filterCategory, search, isFilterMode, appliedFilters]);
 
-    const json = await res.json();
-    const pagination = json.response;
-
-    setData(pagination.results);
-    setTotalPages(pagination.totalPages);
-
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
-}, [currentPage, filterCategory, search, isFilterMode, appliedFilters]);
-
-  // ✅ Restore page, search, filter & highlight after edit
+  //  Restore page, search, filter & highlight after edit
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const ctx = searchParams.get("ctx");
@@ -137,6 +115,21 @@ const [isFilterMode, setIsFilterMode] = useState(false);     //chips
     }
   };
 
+  const highlightText = (text, search) => {
+  if (!search) return text;
+
+  const regex = new RegExp(`(${search})`, "gi");
+
+  const parts = text.split(regex);
+
+  return parts.map((part, i) =>
+    part.toLowerCase() === search.toLowerCase()
+      ? <mark key={i}>{part}</mark>
+      : part
+  );
+};
+
+
   // Encode row data
   const encodeCtx = (obj) => encodeURIComponent(JSON.stringify(obj));
 
@@ -183,15 +176,15 @@ const [isFilterMode, setIsFilterMode] = useState(false);     //chips
           >
             <FaSearch /> Filters | <FaFilter />
           </button>
-<FilterScreen
-  isOpen={isFilterOpen}
-  isClose={() => setFilterScreen(false)}
-  setData={setData}
-  setCurrentPage={setCurrentPage}  
-  setTotalPages={setTotalPages}
-  setAppliedFilters={setAppliedFilters}
-  setIsFilterMode={setIsFilterMode}   //chips
-/>
+          <FilterScreen
+            isOpen={isFilterOpen}
+            isClose={() => setFilterScreen(false)}
+            setData={setData}
+            setCurrentPage={setCurrentPage}
+            setTotalPages={setTotalPages}
+            setAppliedFilters={setAppliedFilters}
+            setIsFilterMode={setIsFilterMode} //chips
+          />
         </div>
 
         {/* Table */}
@@ -219,13 +212,13 @@ const [isFilterMode, setIsFilterMode] = useState(false);     //chips
                   className={item.id === lastEditId ? "highlight-row" : ""}
                 >
                   <td>{item.id}</td>
-                  <td>{item.productName}</td>
-                  <td>{item.category}</td>
-                  <td>{item.mrp}</td>
-                  <td>{item.sp}</td>
-                  <td>{item.cp}</td>
-                  <td>{item.classification}</td>
-                  <td>{item.size}</td>
+                  <td>{highlightText(item.productName, search)}</td>
+                  <td>{highlightText(item.category, search)}</td>
+                  <td>{highlightText(item.mrp, search)}</td>
+                  <td>{highlightText(item.sp, search)}</td>
+                  <td>{highlightText(item.cp, search)}</td>
+                  <td>{highlightText(item.classification, search)}</td>
+                  <td>{highlightText(item.size, search)}</td>
                   <td>
                     <Link
                       to={`/EditProduct?ctx=${encodeCtx({
@@ -254,64 +247,63 @@ const [isFilterMode, setIsFilterMode] = useState(false);     //chips
           </tbody>
         </table>
 
+        {/* FILTER CHIPS - state and nultiple filters applied in filter scereen */}
 
-        {/* FILTER CHIPS - state and nultiple filters applied in filter scereen */ }
-       
-{isFilterMode && Object.keys(appliedFilters).length > 0 && (
-  
-  <div className="filter-chips-container">
-    <span 
-      className="chip clear-all"
-      onClick={() => {
-        setAppliedFilters({});
-        setIsFilterMode(false);
-        setCurrentPage(1);
-      }}> ✖ Clear All </span>
+        {isFilterMode && Object.keys(appliedFilters).length > 0 && (
+          <div className="filter-chips-container">
+            <span
+              className="chip clear-all"
+              onClick={() => {
+                setAppliedFilters({});
+                setIsFilterMode(false);
+                setCurrentPage(1);
+              }}
+            >
+              {" "}
+              ✖ Clear All{" "}
+            </span>
 
-   
+            {Object.entries(appliedFilters).map(([key, value]) => (
+              <span key={key} className="chip">
+                {key}
+                {value.operator === "gt" && " > "}
+                {value.operator === "lt" && " < "}
+                {value.operator === "eq" && " = "}
+                {value.operator === "ilike" && " contains "}
+                {value.value}
 
-    {Object.entries(appliedFilters).map(([key, value]) => (
-      <span key={key} className="chip">
-     {key} 
-{value.operator === "gt" && " > "}
-{value.operator === "lt" && " < "}
-{value.operator === "eq" && " = "}
-{value.operator === "ilike" && " contains "}
-{value.value}
-        
-        <button
-          className="chip-close"
-          onClick={() => {
-            const updated = { ...appliedFilters };
-            delete updated[key];
+                <button
+                  className="chip-close"
+                  onClick={() => {
+                    const updated = { ...appliedFilters };
+                    delete updated[key];
 
-// Before:
-// {
-//  product_name: {...},
-//  mrp: {...}
-// }
+                    // Before:
+                    // {
+                    //  product_name: {...},
+                    //  mrp: {...}
+                    // }
 
-// After:
-// {
-//  product_name: {...}
-// }
+                    // After:
+                    // {
+                    //  product_name: {...}
+                    // }
 
-// Then:setAppliedFilters(updated)
+                    // Then:setAppliedFilters(updated)
 
-            setAppliedFilters(updated);
+                    setAppliedFilters(updated);
 
-            if (Object.keys(updated).length === 0) {
-              setIsFilterMode(false);
-            }
-          }}
-        >
-          ✖
-        </button>
-      </span>
-    ))}
-
-  </div>
-)}
+                    if (Object.keys(updated).length === 0) {
+                      setIsFilterMode(false);
+                    }
+                  }}
+                >
+                  ✖
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Pagination */}
         <div className="pagination">

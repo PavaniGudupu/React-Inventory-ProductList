@@ -10,31 +10,51 @@ export const getProductListNew = async (columns) => {
 //     "mrp": { "operator": ">", "value": 1000 }
 //     "sp": { "operator": ">", "value": 1000 }
 //   }
-  for (let key in filters) { 
-    const filter = filters[key]; //{ "operator": ">", "value": 1000 }
-    const operator = filter.operator || "ilike"; // > , <....
-    if (operator === "eq") {
-      conditions.push(`${key} = '${filter.value}'`); // "value": 1000
-    }
-    if (operator === "gt") {
-      conditions.push(`${key} > ${filter.value}`);
-    }
-    if (operator === "lt") {
-      conditions.push(`${key} < ${filter.value}`);
-    }
-    if (operator === "ilike") {
-      conditions.push(`${key} ILIKE '${filter.value}'`);
-    }
+for (let key in filters) {
+  const filter = filters[key];
+  const operator = filter.operator || "ilike";
+  const value = filter.value;
+
+  if (operator === "eq") {
+    conditions.push(`${key} = '${value}'`);
   }
+
+  if (operator === "gt") {
+    conditions.push(`${key} > ${value}`);
+  }
+
+  if (operator === "lt") {
+    conditions.push(`${key} < ${value}`);
+  }
+
+  if (operator === "ilike") {
+    conditions.push(`${key} ILIKE '%${value}%'`);
+  }
+
+  if (operator === "contains") {
+    conditions.push(`${key} ILIKE '%${value}%'`);
+  }
+
+  if (operator === "starts") {
+    conditions.push(`${key} ILIKE '${value}%'`);
+  }
+
+  if (operator === "ends") {
+    conditions.push(`${key} ILIKE '%${value}'`);
+  }
+    }
   if (conditions.length > 0) {
     sql += " WHERE " + conditions.join(" AND ");
-    //It joins array elements into one string.
-    //conditions = ["mrp > 100", "sp < 500", "productName ILIKE '%rice%'"];
-    //becomes mrp > 100 AND sp < 500 AND productName ILIKE '%rice%'
-    //so, sql is = SELECT * FROM products WHERE mrp > 100 AND sp < 500 AND productName ILIKE '%rice%'
   }
   sql += ` ORDER BY p.id DESC LIMIT ${size} OFFSET ${offset}`;
- // console.log(sql);
+
+// SELECT p.*, c.category FROM products p 
+// INNER JOIN category c ON p.category_id = c.category_id
+
+// WHERE mrp > 1000 AND sp < 5000 AND name ILIKE '%iphone%'
+
+// ORDER BY p.id DESC
+// LIMIT 10 OFFSET 0;
   return db.manyOrNone(sql);
 };
 

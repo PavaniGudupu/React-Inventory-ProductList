@@ -1,14 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../Styles/Add.css";
 import { FaCheck } from "react-icons/fa";
 import { FaBackward } from "react-icons/fa6";
 import { MdCleaningServices } from "react-icons/md";
 
-const FitlerScreen = ({ isOpen, isClose, setData, setCurrentPage, setTotalPages, setAppliedFilters, setIsFilterMode }) => {
+const FitlerScreen = ({
+  isOpen,
+  isClose,
+  setData,
+  setCurrentPage,
+  setTotalPages,
+  setAppliedFilters,
+  setIsFilterMode,
+}) => {
   const clearFilters = {
     id: "",
+    idOperator: "",
     product_name: "",
-    category_id: "",
+    categoryOperator: "",
+    category: "",
     mrpOperator: "",
     mrpValue: "",
     spOperator: "",
@@ -16,12 +26,14 @@ const FitlerScreen = ({ isOpen, isClose, setData, setCurrentPage, setTotalPages,
     cpOperator: "",
     cpValue: "",
     classification: "",
-    size: ""
-  }
+    size: "",
+  };
   const [filters, setFilters] = useState({
     id: "",
+    idOperator: "",
     product_name: "",
-    category_id: "",
+    categoryOperator: "",
+    category: "",
     mrpOperator: "",
     mrpValue: "",
     spOperator: "",
@@ -29,9 +41,9 @@ const FitlerScreen = ({ isOpen, isClose, setData, setCurrentPage, setTotalPages,
     cpOperator: "",
     cpValue: "",
     classification: "",
-    size: ""
-  })
-  const [filterCategory, setFilterCategory] = useState([]);
+    size: "",
+  });
+  // const [filterCategory, setFilterCategory] = useState([]);
   const priceFilters = [
     { label: "⇄", value: "" },
     { label: "<", value: "lt" },
@@ -39,18 +51,14 @@ const FitlerScreen = ({ isOpen, isClose, setData, setCurrentPage, setTotalPages,
     { label: ">", value: "gt" },
   ];
 
-  useEffect(() => {
-    fetch(`http://localhost:4000/category`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(),
-    })
-      .then((res) => res.json())
-      .then((json) => setFilterCategory(json.response))
-      .catch((error) => {
-        console.log(error.message);
-      });
-  }, []);
+const textFilters = [
+  { label: "⇄", value: "" },
+  { label: "contains", value: "contains" },
+  { label: "equals", value: "eq" },
+  { label: "starts with", value: "starts" },
+  { label: "ends with", value: "ends" },
+];
+
 
 
   const handleChange = (event) => {
@@ -58,110 +66,84 @@ const FitlerScreen = ({ isOpen, isClose, setData, setCurrentPage, setTotalPages,
     setFilters((prev) => {
       return {
         ...prev,
-        [name]: value
-      }
-    })
-  }
-
-
-const handleApply = async () => {
-  let formattedFilters = {};
-
-  // Product Code
-  if (filters.id) { //state in inpiut fields
-    formattedFilters.id = {
-      operator: "eq",
-      value: filters.id,
-    };
-  }
-
-  // Product Name
-  if (filters.product_name) {
-    formattedFilters.product_name = {
-      operator: "ilike",
-      value: filters.product_name,
-    };
-  }
-
-  // Category
-  if (filters.category_id) {
-    formattedFilters.category = {
-      operator: "eq",
-      value: filters.category_id,
-    };
-  }
-
-  // MRP
-  if (filters.mrpOperator && filters.mrpValue) {
-    formattedFilters.mrp = {
-      operator: filters.mrpOperator,
-      value: filters.mrpValue,
-    };
-  }
-
-  // SP
-  if (filters.spOperator && filters.spValue) {
-    formattedFilters.sp = {
-      operator: filters.spOperator,
-      value: filters.spValue,
-    };
-  }
-
-  // CP
-  if (filters.cpOperator && filters.cpValue) {
-    formattedFilters.cp = {
-      operator: filters.cpOperator,
-      value: filters.cpValue,
-    };
-  }
-
-  // Classification
-  if (filters.classification) {
-    formattedFilters.classification = {
-      operator: "ilike",
-      value: filters.classification,
-    };
-  }
-
-  // Size
-  if (filters.size) {
-    formattedFilters.size = {
-      operator: "ilike",
-      value: filters.size,
-    };
-  }
-
-  try {
-    const response = await fetch("http://localhost:4000/productList-Filters", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        filters: formattedFilters,
-        page: 1,
-        size: 10,
-      }),
+        [name]: value,
+      };
     });
+  };
 
-    const data = await response.json();
+  const handleApply = async () => {
+    let formattedFilters = {};
 
-    console.log("Filtered Data:", data);
+    // Product Code
+    if (filters.id && filters.idOperator) {
+      formattedFilters["p.id"] = {
+        operator: filters.idOperator,
+        value: filters.id,
+      };
+    }
 
-    const pagination = data.response;
+    // Product Name
+    if (filters.product_name) {
+      formattedFilters["p.product_name"] = {
+        operator: "ilike",
+        value: filters.product_name,
+      };
+    }
 
-setData(pagination.results);
-setTotalPages(pagination.totalPages);
-setAppliedFilters(formattedFilters);
-setIsFilterMode(true);
-setCurrentPage(1);
-isClose();
+    
+// Category
+if (filters.category && filters.categoryOperator) {
+  formattedFilters["c.category"] = {
+    operator: filters.categoryOperator,
+    value: filters.category,
+  };
+}
 
-  } catch (error) {
-    console.error(error.message);
-  }
-};
+    // MRP
+    if (filters.mrpOperator && filters.mrpValue) {
+      formattedFilters["p.mrp"] = {
+        operator: filters.mrpOperator,
+        value: filters.mrpValue,
+      };
+    }
 
+    // SP
+    if (filters.spOperator && filters.spValue) {
+      formattedFilters["p.sp"] = {
+        operator: filters.spOperator,
+        value: filters.spValue,
+      };
+    }
+
+    // CP
+    if (filters.cpOperator && filters.cpValue) {
+      formattedFilters["p.cp"] = {
+        operator: filters.cpOperator,
+        value: filters.cpValue,
+      };
+    }
+
+    // Classification
+    if (filters.classification) {
+      formattedFilters["p.classification"] = {
+        operator: "ilike",
+        value: filters.classification,
+      };
+    }
+
+    // Size
+    if (filters.size) {
+      formattedFilters["p.size"] = {
+        operator: "ilike",
+        value: filters.size,
+      };
+    }
+
+    setAppliedFilters(formattedFilters);
+    setIsFilterMode(true);
+    setCurrentPage(1);
+    isClose();
+  };
 
   return (
     <div className={`filter-panel ${isOpen ? "open" : ""}`}>
@@ -177,22 +159,35 @@ isClose();
           <div className="col-md-12">
             <br></br>
             <label className="form-label">Product Code</label>
+            <select
+              name="idOperator"
+              value={filters.idOperator}
+              className="form-price-select"
+              onChange={handleChange}
+            >
+              {priceFilters.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
             <input
-            onChange={handleChange}
-              className="filter-control"
+              className="form-control"
               name="id"
-              placeholder="Enter Product Code"
               value={filters.id}
+              onChange={handleChange}
+              placeholder="Enter Product Code"
               type="number"
+              step="0.01"
             />
           </div>
         </div>
-<br></br>
+        <br></br>
         <div className="row">
           <div className="col-md-12">
             <label className="form-label">Product Name</label>
             <input
-             onChange={handleChange}
+              onChange={handleChange}
               className="filter-control"
               name="product_name"
               placeholder="Enter Product Name"
@@ -201,38 +196,45 @@ isClose();
             />
           </div>
         </div>
-<br></br>
+        <br></br>
+
         <div className="row">
           <div className="col-md-12">
             <label className="form-label">Category</label>
-<select 
-  className="filter-select" 
-  name="category_id"
-  onChange={handleChange}
-  value={filters.category_id}
->
-              <option className="filter-select-placeholder" value="">
-                --- Select the Category ---
-              </option>
-
-              {filterCategory.map((item) => {
-                return (
-                  <option key={item.category_id} value={item.category}>
-                    {item.category}
-                  </option>
-                );
-              })}
+            <select
+              name="categoryOperator"
+              value={filters.categoryOperator}
+              className="form-price-select"
+              onChange={handleChange}
+            >
+              {textFilters.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.label}
+                </option>
+              ))}
             </select>
+            <input
+              className="form-control"
+              name="category"
+              value={filters.category}
+              onChange={handleChange}
+              placeholder="Enter Category"
+              type="text"
+            />
+
           </div>
         </div>
-<br></br>
+
+        <br></br>
         <div className="row">
           <div className="col-md-4">
             <label className="form-label">MRP</label>
-            <select name="mrpOperator" 
-            value={filters.mrpOperator} 
-            className="form-price-select"  
-            onChange={handleChange}>
+            <select
+              name="mrpOperator"
+              value={filters.mrpOperator}
+              className="form-price-select"
+              onChange={handleChange}
+            >
               {priceFilters.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
@@ -253,9 +255,17 @@ isClose();
 
         <div className="row">
           <div className="col-md-4">
-            <label className="form-label">SP  <br></br></label><br></br><br></br>
-            <select name="spOperator" value={filters.spOperator} className="form-price-select"  
-            onChange={handleChange}>
+            <label className="form-label">
+              SP <br></br>
+            </label>
+            <br></br>
+            <br></br>
+            <select
+              name="spOperator"
+              value={filters.spOperator}
+              className="form-price-select"
+              onChange={handleChange}
+            >
               {priceFilters.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
@@ -270,15 +280,22 @@ isClose();
               onChange={handleChange}
               type="number"
               step="0.01"
-              required
             />
           </div>
         </div>
 
         <div className="row">
           <div className="col-md-4">
-            <label className="form-label">CP  <br></br></label><br></br>
-            <select name="cpOperator" value={filters.cpOperator} className="form-price-select"  onChange={handleChange}>
+            <label className="form-label">
+              CP <br></br>
+            </label>
+            <br></br>
+            <select
+              name="cpOperator"
+              value={filters.cpOperator}
+              className="form-price-select"
+              onChange={handleChange}
+            >
               {priceFilters.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
@@ -293,15 +310,15 @@ isClose();
               value={filters.cpValue}
               type="number"
               step="0.01"
-              required
             />
           </div>
         </div>
-<br></br>
+        <br></br>
         <div className="row">
           <div className="col-md-12">
             <label className="form-label">Classification</label>
-            <input  onChange={handleChange}
+            <input
+              onChange={handleChange}
               className="filter-control"
               name="classification"
               placeholder="Enter Classification"
@@ -310,11 +327,12 @@ isClose();
             />
           </div>
         </div>
-<br />
+        <br />
         <div className="row">
           <div className="col-md-12">
             <label className="form-label">Size</label>
-            <input  onChange={handleChange}
+            <input
+              onChange={handleChange}
               className="filter-control"
               name="size"
               placeholder="Enter Size"
@@ -324,24 +342,31 @@ isClose();
           </div>
         </div>
 
-<br></br>
+        <br></br>
 
-<div className="row">
-  <button
-  type="button"
-  onClick={handleApply}
-  className="filter-apply-btn"
->Apply <FaCheck /></button>
-  
-  <button type="submit" onClick={() => setFilters(clearFilters)} className="filter-clear-btn">Clear <MdCleaningServices /></button>
-  <button type="submit" onClick={isClose} className="filter-close-btn"><FaBackward /> </button>
-  </div>
+        <div className="row">
+          <button
+            type="button"
+            onClick={handleApply}
+            className="filter-apply-btn"
+          >
+            Apply <FaCheck />
+          </button>
 
-
+          <button
+            type="submit"
+            onClick={() => setFilters(clearFilters)}
+            className="filter-clear-btn"
+          >
+            Clear <MdCleaningServices />
+          </button>
+          <button type="submit" onClick={isClose} className="filter-close-btn">
+            <FaBackward />{" "}
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default FitlerScreen;
-
