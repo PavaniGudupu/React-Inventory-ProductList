@@ -12,9 +12,9 @@ import {
   productIdValidation,
 } from "./middleware/productValidation.js";
 import { validationResult } from "express-validator";
-
+import env from 'dotenv';
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -47,7 +47,7 @@ app.post("/productList", async (req, res) => {
       offset,
     });
     }
-
+  
     const results = rows.map(mapToViewDTO);
     const totalPages = Math.ceil(total / limit);
 

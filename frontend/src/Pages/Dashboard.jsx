@@ -43,7 +43,7 @@ const Dashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
       });
-      const json = await res.json();
+      const json = await res.json(); 
       const pagination = json.response;
       setData(pagination.results);
       setTotalPages(pagination.totalPages);
@@ -118,7 +118,7 @@ const Dashboard = () => {
   const highlightText = (text, search) => {
   if (!search) return text;
 
-  const regex = new RegExp(`(${search})`, "gi");
+  const regex = new RegExp(`(${search})`, "gi"); //"gi" flags - global , ignore case
 
   const parts = text.split(regex);
 
