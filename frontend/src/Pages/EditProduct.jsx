@@ -70,7 +70,7 @@ if (ctx) {
 
 
 if(!ctx && productId) {
-  fetch(`http://localhost:4000/product/${productId}`, {
+  fetch(`https://pern-backend-y1w9.onrender.com/${productId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" }
   })
@@ -102,7 +102,7 @@ if(!ctx && productId) {
 
 
 useEffect(() => {
-  fetch("http://localhost:4000/category", {
+  fetch("https://pern-backend-y1w9.onrender.com/category", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   })
@@ -129,7 +129,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   try {
     const response = await fetch(
-      `http://localhost:4000/editProduct/${productId}`,
+      `https://pern-backend-y1w9.onrender.com/editProduct/${productId}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

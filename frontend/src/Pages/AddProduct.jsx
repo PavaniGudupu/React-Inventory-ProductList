@@ -24,7 +24,7 @@ export const AddProduct = () => {
 
 
 useEffect(() => {
-  fetch("http://localhost:4000/category", {
+  fetch("https://pern-backend-y1w9.onrender.com/category", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   })
@@ -56,7 +56,7 @@ const handleSubmit = async (event) => {
   event.preventDefault();
 
   try {
-    const response = await fetch("http://localhost:4000/addProduct", {
+    const response = await fetch("https://pern-backend-y1w9.onrender.com/addProduct", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),

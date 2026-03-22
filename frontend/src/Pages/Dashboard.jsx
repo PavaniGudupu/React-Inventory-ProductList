@@ -38,7 +38,7 @@ const Dashboard = () => {
           ? { filters: appliedFilters }
           : { filterCategory, search }),
       };
-      const res = await fetch("http://localhost:4000/productList", {
+      const res = await fetch("https://pern-backend-y1w9.onrender.com/productList", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
@@ -102,7 +102,7 @@ const Dashboard = () => {
     if (!window.confirm("Are you sure?")) return;
 
     try {
-      const res = await axios.post(`http://localhost:4000/deleteProduct/${id}`);
+      const res = await axios.post(`https://pern-backend-y1w9.onrender.com/deleteProduct/${id}`);
 
       if (res.data.success) {
         toast.success("Product deleted");
