@@ -6,6 +6,9 @@ import { MdAddShoppingCart } from "react-icons/md";
 import Navbar from "../Partials/Navbar";
 import { toast } from "react-toastify";
 
+
+const API = process.env.REACT_APP_API_URL;
+
 export const AddProduct = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -24,7 +27,7 @@ export const AddProduct = () => {
 
 
 useEffect(() => {
-  fetch("https://pern-backend-y1w9.onrender.com/category", {
+  fetch(`${API}/category`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   })
@@ -56,7 +59,7 @@ const handleSubmit = async (event) => {
   event.preventDefault();
 
   try {
-    const response = await fetch("https://pern-backend-y1w9.onrender.com/addProduct", {
+    const response = await fetch(`${API}/addProduct`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),

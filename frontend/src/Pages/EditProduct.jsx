@@ -7,7 +7,7 @@ import Navbar from "../Partials/Navbar";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 
-
+const API = process.env.REACT_APP_API_URL;
 export const EditProduct = () => {
   const navigate = useNavigate();
 const location = useLocation();
@@ -70,7 +70,7 @@ if (ctx) {
 
 
 if(!ctx && productId) {
-  fetch(`https://pern-backend-y1w9.onrender.com/${productId}`, {
+  fetch(`${API}/${productId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" }
   })
@@ -102,7 +102,7 @@ if(!ctx && productId) {
 
 
 useEffect(() => {
-  fetch("https://pern-backend-y1w9.onrender.com/category", {
+  fetch(`${API}/category`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   })
@@ -129,7 +129,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   try {
     const response = await fetch(
-      `https://pern-backend-y1w9.onrender.com/editProduct/${productId}`,
+      `${API}/editProduct/${productId}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

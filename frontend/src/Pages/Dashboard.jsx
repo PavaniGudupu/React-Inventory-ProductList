@@ -12,6 +12,8 @@ import FilterScreen from "./FitlerScreen.jsx";
 import { FaSearch } from "react-icons/fa";
 import { FaFilter } from "react-icons/fa";
 
+const API = process.env.REACT_APP_API_URL;
+
 const Dashboard = () => {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("p.product_name");
@@ -27,7 +29,6 @@ const Dashboard = () => {
 
   const size = 10;
   const location = useLocation();
-
   //  Fetch products
   const fetchProducts = useCallback(async () => {
     try {
@@ -38,7 +39,7 @@ const Dashboard = () => {
           ? { filters: appliedFilters }
           : { filterCategory, search }),
       };
-      const res = await fetch("https://pern-backend-y1w9.onrender.com/productList", {
+      const res = await fetch(`${API}/productList`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData),
@@ -102,7 +103,7 @@ const Dashboard = () => {
     if (!window.confirm("Are you sure?")) return;
 
     try {
-      const res = await axios.post(`https://pern-backend-y1w9.onrender.com/deleteProduct/${id}`);
+      const res = await axios.post(`${API}/deleteProduct/${id}`);
 
       if (res.data.success) {
         toast.success("Product deleted");
