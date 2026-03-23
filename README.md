@@ -3,6 +3,8 @@
 
 A frontend Inventory Management Dashboard built with **React.js**, implementing advanced **pagination handling** and **URI encoded component communication** to preserve user state and improve navigation experience.
 
+Live: https://stateful-ui-search-page-persistence.vercel.app/
+
 This project focuses on:
 
 - Managing large datasets using server-side pagination  
@@ -11,10 +13,11 @@ This project focuses on:
 - Restoring user search & filter context  
 - Enhancing user experience with dynamic highlighting  
 
-Live: https://stateful-ui-search-page-persistence.vercel.app/
 
-<img width="1919" height="995" alt="Screenshot 2026-03-23 214002" src="https://github.com/user-attachments/assets/f65eb8cd-d12c-493a-b26f-f70f96bb8283" />
+
 <img width="1919" height="994" alt="Screenshot 2026-03-23 213851" src="https://github.com/user-attachments/assets/340cecc2-3473-48cc-8bb9-51a6594ffc79" />
+<img width="1919" height="995" alt="Screenshot 2026-03-23 214002" src="https://github.com/user-attachments/assets/f65eb8cd-d12c-493a-b26f-f70f96bb8283" />
+
 
 
 
