@@ -11,6 +11,7 @@ This project focuses on:
 - Restoring user search & filter context  
 - Enhancing user experience with dynamic highlighting  
 
+Live: https://stateful-ui-search-page-persistence.vercel.app/
 
 https://github.com/user-attachments/assets/bdddda33-732e-4ef1-8efb-72dae06da1ec
 
