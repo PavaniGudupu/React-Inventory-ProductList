@@ -1,7 +1,7 @@
 #  React Inventory - Product List
 
 
-A frontend Inventory Management Dashboard built with **React.js**, implementing advanced **pagination handling** and **URI encoded component communication** to preserve user state and improve navigation experience.
+A Full Stack Inventory Product List built with **React.js**, implementing advanced **pagination handling** and **URI encoded component communication** to preserve user state and improve navigation experience.
 
 Live: https://stateful-ui-search-page-persistence.vercel.app/
 
